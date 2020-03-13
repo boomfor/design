@@ -1,11 +1,41 @@
-from django.http.response import JsonResponse
+from django.http.response import JsonResponse,FileResponse
 import json
 import requests
 from django.views import View
 from utils.util import ReturnCode,wrap_json_response,CommonResponseMixin,is_authorized
 from .models import User,Customer,Cus_Follow_Record,Cus_Sign_Record
 import datetime
+
 # Create your views here
+class SignCus(View,CommonResponseMixin):
+    def get(self,request):
+        if not is_authorized(request):
+            response = self.wrap_json_response(code=ReturnCode.FAILED, message="failed")
+            return JsonResponse(response, safe=False)
+        data ={}
+        open_id = request.session.get("open_id")
+        cus = Customer.objects.filter(open_id=open_id,cus_sign="1").values()
+        data['data'] = list(cus)
+        return JsonResponse(data, safe=False)
+
+
+class SearchCus(View,CommonResponseMixin):
+    def post(self,request):
+        if not is_authorized(request):
+            response = self.wrap_json_response(code=ReturnCode.FAILED, message="failed")
+            return JsonResponse(response, safe=False)
+        post_data = request.body.decode('utf-8')
+        post_data = json.loads(post_data)
+        name = post_data.get("name").strip()
+        data = {}
+        if name:
+            cus = Customer.objects.filter(cus_name__contains=name).values()
+            data['data'] = list(cus)
+        else:
+            data['data'] = []
+        return JsonResponse(data, safe=False)
+
+
 class AllCus(View,CommonResponseMixin):
     def get(self,request):
         if not is_authorized(request):
@@ -16,8 +46,14 @@ class AllCus(View,CommonResponseMixin):
         cus = Customer.objects.filter(open_id=open_id).values()
         data['data'] = list(cus)
         return JsonResponse(data, safe=False)
-
-
+    def post(self,request):
+        if not is_authorized(request):
+            response = self.wrap_json_response(code=ReturnCode.FAILED, message="failed")
+            return JsonResponse(response, safe=False)
+        data = {}
+        cus = Customer.objects.filter(open_id=None).values()
+        data['data'] = list(cus)
+        return JsonResponse(data, safe=False)
 
 class CusInfoChange(View,CommonResponseMixin):
     def post(self,request):
@@ -62,6 +98,15 @@ class CusFollow(View,CommonResponseMixin):
         customer = Customer.objects.filter(cus_coming_time__year=year, cus_coming_time__month=month,
                                                  cus_coming_time__day=day,open_id=open_id).values()
         data['data'] = list(customer)
+        return JsonResponse(data, safe=False)
+    def get(self,request):
+        if not is_authorized(request):
+            response = self.wrap_json_response(code=ReturnCode.FAILED, message="failed")
+            return JsonResponse(response, safe=False)
+        data = {}
+        open_id = request.session.get("open_id")
+        cus = Customer.objects.filter(open_id=open_id,cus_sign="0").values()
+        data['data'] = list(cus)
         return JsonResponse(data, safe=False)
 
 
