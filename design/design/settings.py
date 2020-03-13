@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '$@--m=jtopdys*k@=+usuddm%bz$jfxytgz!yq2xcc(njsx#s+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["www.cardemo.club"]
 
 
 # Application definition
@@ -80,8 +80,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'design',
         'USER': 'root',
-        'PASSWORD': '123456',
-        'HOST': '127.0.0.1',
+        'PASSWORD': '123456789',
+        'HOST': '62.234.125.41',
         'PORT': '3306',
     }
 }
